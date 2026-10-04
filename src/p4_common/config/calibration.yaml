@@ -1,0 +1,62 @@
+# SO-101 calibration
+# Measured 2026-09-20. Arm clamped, /dev/ttyACM0 @ 1000000 baud.
+#
+# offset   : tick reading at zero radians
+# sign     : +1 if increasing ticks moves the joint the URDF's positive way
+# servo_id : ID on the bus. NOT the motor1-6 label in the URDF.
+#
+# METHOD
+# Torque off, joint moved by hand to both mechanical stops, ticks read
+# at each end. sign from which way ticks moved between them. offset is
+# the midpoint of the estimate from each stop. Then verified by driving
+# every joint to its offset value (= 0 rad) and comparing the arm to
+# MuJoCo with all qpos at 0.
+#
+# KNOWN ISSUE — READ BEFORE TRUSTING THE SIGNS
+# The first stop-measurement pass swapped "lower" and "upper" on some
+# joints. "Lower" means the end at the URDF's NEGATIVE angle, which is
+# not the same as the end that is physically further down, and for a
+# joint rotating about a vertical axis neither end is down.
+#
+# shoulder_pan was re-measured correctly and came back +1 (stops at
+# 760 and 3463 ticks). elbow_flex and wrist_roll were NOT re-measured.
+# Their signs below are set to +1 on the strength of the MuJoCo
+# comparison only, which agreed with the corrected shoulder_pan result.
+# That is one source, not two. Re-run the stop measurement on those
+# two joints before relying on them.
+#
+# OFFSETS
+# shoulder_pan: the corrected stop measurement gives 2112. The value
+# below is 2096, from the earlier pass, because that is the number
+# that was visually verified against MuJoCo at the zero pose. The two
+# differ by 16 ticks (1.4 deg), inside what the eye can resolve.
+#
+# elbow_flex: 1875 is eyeballed, not derived. The stop measurement put
+# it at 1802; it was tuned by eye until the arm matched MuJoCo at zero.
+# That is a shift of 73 ticks. The URDF carries a note on elbow_flex
+# and no other joint, "5-degree calibration offset applied to joint
+# limits", which is 57 ticks. Close to 73 but not equal, so that note
+# explains part of it at most.
+#
+# gripper: least trustworthy. Its "lower stop" is rubber pads
+# squeezing, not a hard stop, so where zero sits depends on how hard
+# it was pressed. Expect to tune it once actually grasping.
+#
+# SPAN CHECK
+# Measured spans ran 118-225 ticks WIDER than the URDF limits on five
+# of six joints, always wider, never narrower. Either the URDF limits
+# are software margin sitting inside the real stops, or hand pressure
+# over-travelled the plastic. Unresolved, and it affects whether the
+# midpoint was the right way to pick the offset.
+#
+# TRACKING ERROR
+# Within 4 ticks (0.35 deg) on every joint at the zero pose, and within
+# 12 at +0.5 rad. Nothing binding.
+
+servos:
+  shoulder_pan:  {offset: 2096, servo_id: 1, sign: 1}
+  shoulder_lift: {offset: 2154, servo_id: 2, sign: 1}
+  elbow_flex:    {offset: 1875, servo_id: 3, sign: 1}
+  wrist_flex:    {offset: 2020, servo_id: 4, sign: 1}
+  wrist_roll:    {offset: 2074, servo_id: 5, sign: 1}
+  gripper:       {offset: 2266, servo_id: 6, sign: 1}

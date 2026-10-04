@@ -1,0 +1,9 @@
+<library path="p4_hardware">
+  <class name="p4_hardware/StubSystem"
+         type="p4_hardware::StubSystem"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Hardware backend with no hardware. read() echoes the last command.
+    </description>
+  </class>
+</library>

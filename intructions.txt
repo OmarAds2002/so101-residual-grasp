@@ -1,0 +1,11 @@
+cd ~/p4_ws
+colcon build --packages-select p4_common
+colcon test --packages-select p4_common
+colcon test-result --verbose
+
+
+cd ~/p4_ws
+colcon build --packages-select p4_hardware
+colcon test --packages-select p4_hardware
+colcon test-result --verbose
+./build/p4_hardware/test_feetech_protocol

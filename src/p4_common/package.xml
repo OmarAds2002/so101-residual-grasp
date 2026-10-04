@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>p4_common</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="omarads2002@gmail.com">omarads</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>yaml-cpp</depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>tinyxml2_vendor</test_depend>
+  <test_depend>libtinyxml2-dev</test_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>

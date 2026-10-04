@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so101">
+
+  <xacro:include filename="$(find p4_common)/urdf/so101_new_calib.urdf"/>
+
+  <ros2_control name="P4Stub" type="system">
+    <hardware>
+      <plugin>p4_hardware/StubSystem</plugin>
+      <param name="calibration_path">$(find p4_common)/config/calibration.yaml</param>
+    </hardware>
+
+    <joint name="shoulder_pan">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+    <joint name="shoulder_lift">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+    <joint name="elbow_flex">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+    <joint name="wrist_flex">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+    <joint name="wrist_roll">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+    <joint name="gripper">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+    </joint>
+  </ros2_control>
+
+</robot>
