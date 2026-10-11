@@ -1,10 +1,19 @@
 <mujoco model="so101_new_calib">
   <compiler angle="radian" meshdir="../urdf"/>
-  <option timestep="0.002" integrator="implicitfast"/>
+  <option timestep="0.001" integrator="implicitfast"/>
   <default>
-    <joint damping="0.1" frictionloss="0.05" armature="0.01"/>
-    <position kp="20" kv="1" forcerange="-10 10"/>
-  </default>
+  <!-- Fitted S06 against recorded real trajectories. See
+       tools/sysid/fit_mjcf.py and results/08_mjcf_fit.md.
+       kp from shoulder_lift, where gravity makes it identifiable.
+       damping and frictionloss are a RIDGE, not a point: the data pins
+       their combined effect, not the split. Three starts gave
+       damping 0.82-1.54 with friction 1.00-0.66 at costs within 1.5%.
+       Only shoulder_pan and shoulder_lift were fitted. The other four
+       carry these values UNVERIFIED. -->
+  <joint damping="1.54" frictionloss="0.655" armature="0.01"/>
+  <position kp="47.8" kv="0" forcerange="-1.9 1.9"/>
+  <geom contype="0" conaffinity="0"/>
+</default>
   <asset>
     <mesh name="base_motor_holder_so101_v1" file="assets/base_motor_holder_so101_v1.stl"/>
     <mesh name="base_so101_v2" file="assets/base_so101_v2.stl"/>
@@ -28,7 +37,7 @@
     <geom pos="-0.0309827 -0.000199441 0.0474" quat="0.499998 0.5 0.500002 0.5" type="mesh" rgba="1 0.82 0.12 1" mesh="waveshare_mounting_plate_so101_v2"/>
     <body name="shoulder_link" pos="0.0388353 -8.97657e-09 0.0624" quat="1.76036e-12 1.32679e-06 -1 -1.32679e-06">
       <inertial pos="-0.0307604 -1.66727e-05 -0.0252713" quat="0.999865 0.00149563 0.0097084 0.0132043" mass="0.100006" diaginertia="8.37836e-05 8.10388e-05 2.39552e-05"/>
-      <joint name="shoulder_pan" range="-1.91986 1.91986" actuatorfrcrange="-10 10"/>
+      <joint name="shoulder_pan" range="-1.91986 1.91986" actuatorfrcrange="-10 10" damping="2.14" frictionloss="0.48"/>
       <geom pos="-0.0303992 0.000422241 -0.0417" quat="0.499998 0.5 0.5 -0.500002" type="mesh" rgba="0.1 0.1 0.1 1" mesh="sts3215_03a_v1"/>
       <geom pos="-0.0675992 -0.000177759 0.0158499" quat="0.499998 0.5 -0.5 0.500002" type="mesh" rgba="1 0.82 0.12 1" mesh="motor_holder_so101_base_v1"/>
       <geom pos="0.0122008 2.22413e-05 0.0464" quat="0.707105 -0.707108 0 0" type="mesh" rgba="1 0.82 0.12 1" mesh="rotation_pitch_so101_v1"/>
@@ -64,11 +73,8 @@
       </body>
     </body>
   </worldbody>
-  <!-- PLACEHOLDER GAINS. The STS3215's internal PD loop is not
-       identified yet -- kp and kv here are guesses, not measurements.
-       forcerange matches the actuatorfrcrange already on each joint. -->
   <actuator>
-    <position name="shoulder_pan"   joint="shoulder_pan"   ctrlrange="-1.91986 1.91986"/>
+   <position name="shoulder_pan" joint="shoulder_pan" kp="161.5"ctrlrange="-1.91986 1.91986"/>
     <position name="shoulder_lift"  joint="shoulder_lift"  ctrlrange="-1.74533 1.74533"/>
     <position name="elbow_flex"     joint="elbow_flex"     ctrlrange="-1.69 1.69"/>
     <position name="wrist_flex"     joint="wrist_flex"     ctrlrange="-1.65806 1.65806"/>

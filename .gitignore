@@ -1,6 +1,36 @@
-build/
-install/
-log/
+# ---- colcon build output (regenerated, thousands of files) ----
+/build/
+/install/
+/log/
+
+# ---- Python ----
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- editor / OS litter ----
+*~
+*.swp
 .vscode/
+.idea/
+.DS_Store
+
+# ---- environments ----
+.env
+.venv/
+venv/
+
+# ---- MuJoCo scratch ----
+MUJOCO_LOG.TXT
+
+# ---- big media (add back deliberately when the Phase 8 video exists) ----
+*.mp4
+*.mov
+
+# ---- NOT ignored, on purpose ----
+# tools/bringup/results/**   measurement CSVs — the irreplaceable part
+# src/p4_common/config/      calibration.yaml
+# src/p4_common/mjcf/        the fitted model
+# src/p4_common/urdf/        the single URDF
