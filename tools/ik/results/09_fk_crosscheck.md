@@ -153,3 +153,32 @@ python tools/ik/mujoco_fk.py 0 0 0 0 0
 
 Build C++ outside conda. Conda's `libyaml-cpp.so.0.9` against Jazzy's `0.8`
 fails at load, not at build — see `docs/phase0_notes.md`.
+
+---
+
+## Serial-layer verification
+
+Two small programs, `tools/ik/ping_test.cpp` and `tools/ik/read_test.cpp`,
+checked the project's own C++ serial layer against the arm.
+
+**`ping_test.cpp`** pinged servo IDs 1 through 6 over `/dev/ttyACM0` at
+1000000 baud using the project's own C++ (`SerialPort` + `BuildPing` +
+`ResponseReader`). All six replied. This was the first time the project's own
+C++ talked to the arm; everything before went through the vendor Python SDK.
+
+**`read_test.cpp`** read all six present positions through `FeetechBus`, with
+the arm positioned by hand near zero:
+
+| ID | Joint | Read (ticks) | Offset in `src/p4_common/config/calibration.yaml` | Read - offset |
+|---|---|---|---|---|
+| 1 | shoulder_pan  | 1973 | 2096 | -123 |
+| 2 | shoulder_lift | 2202 | 2154 |  +48 |
+| 3 | elbow_flex    | 1891 | 1875 |  +16 |
+| 4 | wrist_flex    | 2042 | 2020 |  +22 |
+| 5 | wrist_roll    | 1085 | 2074 | -989 |
+| 6 | gripper       | 2112 | 2266 | -154 |
+
+Five of six land within ~150 ticks of the calibration offsets; wrist_roll
+differs because it was not near zero. That agreement verifies byte order,
+ID-to-slot mapping and the whole serial path at once, against offsets measured
+independently with the vendor Python SDK in session 03.

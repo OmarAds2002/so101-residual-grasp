@@ -51,6 +51,7 @@ if(BUILD_TESTING)
     CALIBRATION_PATH="${CMAKE_CURRENT_SOURCE_DIR}/config/calibration.yaml"
     URDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/urdf/so101_new_calib.urdf")
   set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_xmllint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
 install(TARGETS p4_common EXPORT export_p4_common
