@@ -7,27 +7,29 @@ own document. This reads what is actually on the bus. Two sources.
 
 from scservo_sdk import *
 
-DEVICENAME, BAUDRATE, PROTOCOL_END = '/dev/ttyACM0', 1000000, 0
+DEVICENAME, BAUDRATE, PROTOCOL_END = "/dev/ttyACM0", 1000000, 0
 IDS = [1, 2, 3, 4, 5, 6]
 
 # addr, name, size
 REGS = [
-    (16, "max_torque_limit",  2),
-    (21, "P_coefficient",     1),
-    (22, "D_coefficient",     1),
-    (23, "I_coefficient",     1),
+    (16, "max_torque_limit", 2),
+    (21, "P_coefficient", 1),
+    (22, "D_coefficient", 1),
+    (23, "I_coefficient", 1),
     (24, "min_startup_force", 2),
-    (26, "cw_dead_zone",      1),
-    (27, "ccw_dead_zone",     1),
-    (33, "mode",              1),
-    (41, "acceleration",      1),
-    (46, "goal_speed",        2),
-    (48, "torque_limit",      2),
+    (26, "cw_dead_zone", 1),
+    (27, "ccw_dead_zone", 1),
+    (33, "mode", 1),
+    (41, "acceleration", 1),
+    (46, "goal_speed", 2),
+    (48, "torque_limit", 2),
 ]
 
 p = PortHandler(DEVICENAME)
-if not p.openPort():      raise SystemExit("failed to open port")
-if not p.setBaudRate(BAUDRATE): raise SystemExit("failed baud")
+if not p.openPort():
+    raise SystemExit("failed to open port")
+if not p.setBaudRate(BAUDRATE):
+    raise SystemExit("failed baud")
 h = PacketHandler(PROTOCOL_END)
 
 print(f"{'register':>20} " + " ".join(f"{i:>6}" for i in IDS))

@@ -14,9 +14,11 @@ from scservo_sdk import *
 ADDR_TORQUE_ENABLE = 40
 IDS = [int(a) for a in sys.argv[1:]] or [1, 2, 3, 4, 5, 6]
 
-p = PortHandler('/dev/ttyACM0')
-if not p.openPort():        raise SystemExit("failed to open port")
-if not p.setBaudRate(1000000): raise SystemExit("failed baud")
+p = PortHandler("/dev/ttyACM0")
+if not p.openPort():
+    raise SystemExit("failed to open port")
+if not p.setBaudRate(1000000):
+    raise SystemExit("failed baud")
 h = PacketHandler(0)
 
 input(f"Arm supported by hand? Releasing {IDS}. [enter] ")

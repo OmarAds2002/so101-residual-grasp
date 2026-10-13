@@ -13,35 +13,38 @@ import time
 from scservo_sdk import *
 
 ADDR_TORQUE_ENABLE = 40
-ADDR_GOAL_ACC      = 41
+ADDR_GOAL_ACC = 41
 ADDR_GOAL_POSITION = 42
-ADDR_GOAL_SPEED    = 46
-ADDR_PRESENT_POS   = 56
+ADDR_GOAL_SPEED = 46
+ADDR_PRESENT_POS = 56
 
-BAUDRATE     = 1000000
-DEVICENAME   = '/dev/ttyACM0'
+BAUDRATE = 1000000
+DEVICENAME = "/dev/ttyACM0"
 PROTOCOL_END = 0
 
 SLOW_SPEED = 300
-SLOW_ACC   = 10
+SLOW_ACC = 10
 
 TICKS_PER_REV = 4096
+
+
 def rad_to_ticks(r):
     return r * TICKS_PER_REV / (2 * math.pi)
 
+
 # name, id, offset, sign, urdf lower, urdf upper
 CAL = [
-    ("shoulder_pan",  1, 2096, -1, -1.91986,  1.91986),
-    ("shoulder_lift", 2, 2154,  1, -1.74533,  1.74533),
-    ("elbow_flex",    3, 1875, -1, -1.69,     1.69),
-    ("wrist_flex",    4, 2020,  1, -1.65806,  1.65806),
-    ("wrist_roll",    5, 2074, -1, -2.74385,  2.84121),
-    ("gripper",       6, 2266,  1, -0.174533, 1.74533),
+    ("shoulder_pan", 1, 2096, -1, -1.91986, 1.91986),
+    ("shoulder_lift", 2, 2154, 1, -1.74533, 1.74533),
+    ("elbow_flex", 3, 1875, -1, -1.69, 1.69),
+    ("wrist_flex", 4, 2020, 1, -1.65806, 1.65806),
+    ("wrist_roll", 5, 2074, -1, -2.74385, 2.84121),
+    ("gripper", 6, 2266, 1, -0.174533, 1.74533),
 ]
 
 TARGET_RAD = 0.5
 
-portHandler   = PortHandler(DEVICENAME)
+portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_END)
 portHandler.openPort()
 portHandler.setBaudRate(BAUDRATE)
@@ -76,7 +79,7 @@ for name, sid, offset, sign, lo, hi in CAL:
         print(f"{name}: {TARGET_RAD} rad is outside the URDF limits — SKIPPING\n")
         continue
 
-    zero_ticks   = to_ticks(offset, sign, 0.0)
+    zero_ticks = to_ticks(offset, sign, 0.0)
     target_ticks = to_ticks(offset, sign, TARGET_RAD)
 
     if not 0 <= target_ticks <= 4095:
@@ -84,14 +87,18 @@ for name, sid, offset, sign, lo, hi in CAL:
         continue
 
     print(f"--- {name} (id {sid}), sign {sign:+d}")
-    print(f"    0.0 rad = {zero_ticks} ticks, "
-          f"{TARGET_RAD:+.1f} rad = {target_ticks} ticks "
-          f"({target_ticks - zero_ticks:+d})")
+    print(
+        f"    0.0 rad = {zero_ticks} ticks, "
+        f"{TARGET_RAD:+.1f} rad = {target_ticks} ticks "
+        f"({target_ticks - zero_ticks:+d})"
+    )
     input(f"    set {name} to +0.5 in MuJoCo, then Enter to move the arm ")
 
     reached = move(sid, target_ticks)
-    print(f"    commanded {target_ticks}, reached {reached}, "
-          f"error {reached - target_ticks:+d}")
+    print(
+        f"    commanded {target_ticks}, reached {reached}, "
+        f"error {reached - target_ticks:+d}"
+    )
 
     answer = input("    same direction as MuJoCo? (y/n) ").strip().lower()
     results[name] = (sign, answer.startswith("y"))

@@ -13,12 +13,13 @@ import numpy as np
 import mujoco
 from fit_mjcf import MJCF, TIMESTEP
 
+
 def run(label, target=0.0, gravity=True, kp=20.0, n_s=2.0):
     m = mujoco.MjModel.from_xml_path(str(MJCF))
     m.opt.timestep = TIMESTEP
     if not gravity:
         m.opt.gravity[:] = 0
-    m.actuator_gainprm[:, 0] =  kp
+    m.actuator_gainprm[:, 0] = kp
     m.actuator_biasprm[:, 1] = -kp
     d = mujoco.MjData(m)
 
@@ -34,8 +35,11 @@ def run(label, target=0.0, gravity=True, kp=20.0, n_s=2.0):
     print(f"  ctrl[0] = {target:+.3f}")
     print(f"  qpos    = {np.array2string(d.qpos, precision=3, suppress_small=True)}")
     print(f"  qvel    = {np.array2string(d.qvel, precision=3, suppress_small=True)}")
-    print(f"  force   = {np.array2string(d.actuator_force, precision=3, suppress_small=True)}")
+    print(
+        f"  force   = {np.array2string(d.actuator_force, precision=3, suppress_small=True)}"
+    )
     print()
+
 
 run("1. all ctrl 0, gravity ON  -- should stay near zero")
 run("2. pan -> +0.4, gravity ON", target=0.4)

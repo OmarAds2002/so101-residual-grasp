@@ -8,28 +8,31 @@ Torque is OFF the whole time — support the arm.
 import math
 from scservo_sdk import *
 
-ADDR_TORQUE_ENABLE    = 40
+ADDR_TORQUE_ENABLE = 40
 ADDR_PRESENT_POSITION = 56
 
-BAUDRATE     = 1000000
-DEVICENAME   = '/dev/ttyACM0'
+BAUDRATE = 1000000
+DEVICENAME = "/dev/ttyACM0"
 PROTOCOL_END = 0
 
 TICKS_PER_REV = 4096
+
+
 def rad_to_ticks(r):
     return r * TICKS_PER_REV / (2 * math.pi)
 
+
 # joint name, servo id, urdf lower, urdf upper
 JOINTS = [
-    ("shoulder_pan",  1, -1.91986,  1.91986),
-    ("shoulder_lift", 2, -1.74533,  1.74533),
-    ("elbow_flex",    3, -1.69,     1.69),
-    ("wrist_flex",    4, -1.65806,  1.65806),
-    ("wrist_roll",    5, -2.74385,  2.84121),
-    ("gripper",       6, -0.174533, 1.74533),
+    ("shoulder_pan", 1, -1.91986, 1.91986),
+    ("shoulder_lift", 2, -1.74533, 1.74533),
+    ("elbow_flex", 3, -1.69, 1.69),
+    ("wrist_flex", 4, -1.65806, 1.65806),
+    ("wrist_roll", 5, -2.74385, 2.84121),
+    ("gripper", 6, -0.174533, 1.74533),
 ]
 
-portHandler   = PortHandler(DEVICENAME)
+portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_END)
 portHandler.openPort()
 portHandler.setBaudRate(BAUDRATE)
@@ -39,12 +42,15 @@ for name, sid, lo, hi in JOINTS:
     packetHandler.write1ByteTxRx(portHandler, sid, ADDR_TORQUE_ENABLE, 0)
 print("Torque is OFF on all six. Support the arm.\n")
 
+
 def read_pos(sid):
     pos, comm, err = packetHandler.read2ByteTxRx(
-        portHandler, sid, ADDR_PRESENT_POSITION)
+        portHandler, sid, ADDR_PRESENT_POSITION
+    )
     if comm != COMM_SUCCESS:
         raise SystemExit(f"read failed on id {sid}")
     return pos
+
 
 for name, sid, lo, hi in JOINTS:
     print(f"--- {name} (id {sid})")

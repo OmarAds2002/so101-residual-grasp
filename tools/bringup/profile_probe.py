@@ -21,27 +21,27 @@ import numpy as np
 from scservo_sdk import *
 
 # --- control table (STS/SMS) -------------------------------------------
-ADDR_TORQUE_ENABLE    = 40
-ADDR_GOAL_ACC         = 41
-ADDR_GOAL_POSITION    = 42
-ADDR_GOAL_SPEED       = 46
+ADDR_TORQUE_ENABLE = 40
+ADDR_GOAL_ACC = 41
+ADDR_GOAL_POSITION = 42
+ADDR_GOAL_SPEED = 46
 ADDR_PRESENT_POSITION = 56
 ADDR_TORQUE_LIMIT = 48
 
 # --- settings ----------------------------------------------------------
-SCS_ID       = 1               # shoulder_pan
-BAUDRATE     = 1000000
-DEVICENAME   = '/dev/ttyACM0'
+SCS_ID = 1  # shoulder_pan
+BAUDRATE = 1000000
+DEVICENAME = "/dev/ttyACM0"
 PROTOCOL_END = 0
 
-START_TICKS  = 2096            # shoulder_pan offset = 0 rad
-STEP_TICKS   = [40, 60, 90, 130, 190, 280, 400] # ~0.15, 0.31, 0.61 rad
-CAPTURE_S    = 1.0             # record this long after each command
-SETTLE_S     = 1.5             # wait before each step
+START_TICKS = 2096  # shoulder_pan offset = 0 rad
+STEP_TICKS = [40, 60, 90, 130, 190, 280, 400]  # ~0.15, 0.31, 0.61 rad
+CAPTURE_S = 1.0  # record this long after each command
+SETTLE_S = 1.5  # wait before each step
 
-OUT_CSV      = "results/profile_probe_raw.csv"
+OUT_CSV = "results/profile_probe_raw.csv"
 
-portHandler   = PortHandler(DEVICENAME)
+portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_END)
 
 if not portHandler.openPort():
@@ -62,6 +62,7 @@ reader = GroupSyncRead(portHandler, packetHandler, ADDR_PRESENT_POSITION, 2)
 if not reader.addParam(SCS_ID):
     raise SystemExit(f"addParam failed for id {SCS_ID}")
 
+
 def read_pos():
     """Returns ticks, or None if the transaction failed."""
     if reader.txRxPacket() != COMM_SUCCESS:
@@ -70,14 +71,15 @@ def read_pos():
         return None
     return reader.getData(SCS_ID, ADDR_PRESENT_POSITION, 2)
 
+
 def goto(ticks):
-    packetHandler.write2ByteTxRx(portHandler, SCS_ID,
-                                 ADDR_GOAL_POSITION, ticks)
+    packetHandler.write2ByteTxRx(portHandler, SCS_ID, ADDR_GOAL_POSITION, ticks)
+
 
 # --- run ---------------------------------------------------------------
 packetHandler.write1ByteTxRx(portHandler, SCS_ID, ADDR_TORQUE_ENABLE, 1)
 
-rows = []          # step_ticks, t_rel_ms, ticks
+rows = []  # step_ticks, t_rel_ms, ticks
 failures = 0
 
 for step in STEP_TICKS:
@@ -88,7 +90,7 @@ for step in STEP_TICKS:
     print(f"\nstep {step:4d}: resting at {p0}, commanding {START_TICKS + step}")
 
     goto(START_TICKS + step)
-    t0 = time.perf_counter()          # clock starts when the write returns
+    t0 = time.perf_counter()  # clock starts when the write returns
 
     while True:
         t = time.perf_counter()
@@ -101,8 +103,10 @@ for step in STEP_TICKS:
         rows.append([step, (t - t0) * 1000.0, p])
 
     settled = [r[2] for r in rows if r[0] == step][-1]
-    print(f"           ended at {settled}  "
-          f"({len([r for r in rows if r[0] == step])} samples)")
+    print(
+        f"           ended at {settled}  "
+        f"({len([r for r in rows if r[0] == step])} samples)"
+    )
 
 goto(START_TICKS)
 time.sleep(SETTLE_S)

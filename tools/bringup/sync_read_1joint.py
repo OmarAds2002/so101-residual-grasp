@@ -15,19 +15,19 @@ import numpy as np
 from scservo_sdk import *
 
 # --- control table addresses -------------------------------------------
-ADDR_STS_GOAL_POSITION    = 42
+ADDR_STS_GOAL_POSITION = 42
 ADDR_STS_PRESENT_POSITION = 56
 
 # --- settings ----------------------------------------------------------
-SCS_IDS      = [1]
-BAUDRATE     = 1000000
-DEVICENAME   = '/dev/ttyACM0'
-PROTOCOL_END = 0          # STS/SMS
+SCS_IDS = [1]
+BAUDRATE = 1000000
+DEVICENAME = "/dev/ttyACM0"
+PROTOCOL_END = 0  # STS/SMS
 
-N_WARMUP     = 100        # thrown away
-N_SAMPLES    = 10000
+N_WARMUP = 100  # thrown away
+N_SAMPLES = 10000
 
-portHandler   = PortHandler(DEVICENAME)
+portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_END)
 
 if not portHandler.openPort():
@@ -40,14 +40,13 @@ print("port open at", BAUDRATE)
 # =======================================================================
 # sync read
 # =======================================================================
-groupSyncRead = GroupSyncRead(portHandler, packetHandler,
-                              ADDR_STS_PRESENT_POSITION, 2)
+groupSyncRead = GroupSyncRead(portHandler, packetHandler, ADDR_STS_PRESENT_POSITION, 2)
 
 for scs_id in SCS_IDS:
     if not groupSyncRead.addParam(scs_id):
         raise SystemExit(f"addParam failed for id {scs_id}")
 
-read_samples  = []
+read_samples = []
 read_failures = 0
 
 for n in range(N_WARMUP + N_SAMPLES):
@@ -60,12 +59,11 @@ for n in range(N_WARMUP + N_SAMPLES):
 
     if comm_result != COMM_SUCCESS:
         read_failures += 1
-        continue                      # a failed transaction is not a sample
+        continue  # a failed transaction is not a sample
 
     read_samples.append((t1 - t0) * 1000.0)
 
 print(f"sync read: {len(read_samples)} samples, {read_failures} failures")
-
 
 
 portHandler.closePort()
@@ -80,6 +78,7 @@ with open("results/latency__sysid_raw.csv", "w", newline="") as f:
     for v in read_samples:
         w.writerow(["sync_read", v])
 
+
 def report(name, s, failures):
     a = np.array(s)
     print(f"\n{name}   ({len(a)} samples, {failures} failures)")
@@ -90,7 +89,8 @@ def report(name, s, failures):
     print(f"  p99.9  {np.percentile(a, 99.9):8.3f} ms")
     print(f"  max    {a.max():8.3f} ms")
 
-report("sync read ", read_samples,  read_failures)
+
+report("sync read ", read_samples, read_failures)
 
 rt = np.percentile(read_samples, 99)
 print(f"\nread p99: {rt:.3f} ms  ->  {1000.0/rt:.0f} Hz ceiling")

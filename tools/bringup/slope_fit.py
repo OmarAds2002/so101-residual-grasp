@@ -13,16 +13,15 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-IN_CSV     = "results/profile_probe_raw.csv"
+IN_CSV = "results/profile_probe_raw.csv"
 VEL_WIN_MS = 10.0
-DEADBAND   = 8.0        # measured: runs stop ~8 ticks short
+DEADBAND = 8.0  # measured: runs stop ~8 ticks short
 
 runs = {}
 with open(IN_CSV) as f:
     for row in csv.DictReader(f):
         step = int(row["step_ticks"])
-        runs.setdefault(step, []).append(
-            (float(row["t_ms"]), float(row["ticks"])))
+        runs.setdefault(step, []).append((float(row["t_ms"]), float(row["ticks"])))
 
 steps, peaks, moved = [], [], []
 
@@ -33,15 +32,17 @@ for step in sorted(runs):
 
     p0 = np.median(p[:10])
     settled = np.median(p[-200:])
-    actual = settled - p0          # what it really travelled
+    actual = settled - p0  # what it really travelled
 
     dt_ms = np.median(np.diff(t))
     w = max(1, int(round(VEL_WIN_MS / dt_ms)))
-    v = (p[2*w:] - p[:-2*w]) / (t[2*w:] - t[:-2*w]) * 1000.0
+    v = (p[2 * w :] - p[: -2 * w]) / (t[2 * w :] - t[: -2 * w]) * 1000.0
     peak = np.max(np.abs(v))
 
     print(f"{step:6d} {actual:7.1f} {peak:10.1f}")
-    steps.append(step); peaks.append(peak); moved.append(actual)
+    steps.append(step)
+    peaks.append(peak)
+    moved.append(actual)
 
 steps = np.array(steps, float)
 peaks = np.array(peaks, float)
@@ -67,10 +68,18 @@ plt.figure(figsize=(7, 6))
 plt.loglog(moved, peaks, "o-", label="measured")
 
 ref = np.array([moved.min(), moved.max()])
-plt.loglog(ref, peaks[0] * (ref / moved[0])**1.0, "--",
-           label="slope 1.0 (linear / PD visible)")
-plt.loglog(ref, peaks[0] * (ref / moved[0])**0.5, ":",
-           label="slope 0.5 (constant acceleration)")
+plt.loglog(
+    ref,
+    peaks[0] * (ref / moved[0]) ** 1.0,
+    "--",
+    label="slope 1.0 (linear / PD visible)",
+)
+plt.loglog(
+    ref,
+    peaks[0] * (ref / moved[0]) ** 0.5,
+    ":",
+    label="slope 0.5 (constant acceleration)",
+)
 
 plt.xlabel("distance actually travelled (ticks)")
 plt.ylabel("peak speed (ticks/s)")

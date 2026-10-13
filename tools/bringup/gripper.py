@@ -18,21 +18,24 @@ far just squeezes harder.
 import sys, time
 from scservo_sdk import *
 
-ADDR_TORQUE_ENABLE    = 40
-ADDR_GOAL_POSITION    = 42
+ADDR_TORQUE_ENABLE = 40
+ADDR_GOAL_POSITION = 42
 ADDR_PRESENT_POSITION = 56
-ADDR_PRESENT_LOAD     = 60
+ADDR_PRESENT_LOAD = 60
 
 SCS_ID = 6
-OFFSET = 2266                 # 0 rad, from calibration.yaml
+OFFSET = 2266  # 0 rad, from calibration.yaml
 
-OPEN_TICKS  = OFFSET + 350    # tune these once you see which way it goes
+OPEN_TICKS = OFFSET + 350  # tune these once you see which way it goes
 CLOSE_TICKS = OFFSET + 60
 
-p = PortHandler('/dev/ttyACM0')
-if not p.openPort():        raise SystemExit("failed to open port")
-if not p.setBaudRate(1000000): raise SystemExit("failed baud")
+p = PortHandler("/dev/ttyACM0")
+if not p.openPort():
+    raise SystemExit("failed to open port")
+if not p.setBaudRate(1000000):
+    raise SystemExit("failed baud")
 h = PacketHandler(0)
+
 
 def read_pos():
     try:
@@ -41,20 +44,24 @@ def read_pos():
     except (IndexError, TypeError):
         return None
 
+
 def read_load():
     try:
         v, comm, _ = h.read2ByteTxRx(p, SCS_ID, ADDR_PRESENT_LOAD)
-        if comm != COMM_SUCCESS: return None
+        if comm != COMM_SUCCESS:
+            return None
         mag = v & 0x3FF
         return -mag if (v & 0x400) else mag
     except (IndexError, TypeError):
         return None
 
+
 arg = sys.argv[1] if len(sys.argv) > 1 else "read"
 
 if arg == "read":
     print(f"position {read_pos()}   load {read_load()}")
-    p.closePort(); raise SystemExit
+    p.closePort()
+    raise SystemExit
 
 target = {"open": OPEN_TICKS, "close": CLOSE_TICKS}.get(arg)
 if target is None:

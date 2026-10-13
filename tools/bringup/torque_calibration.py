@@ -21,32 +21,35 @@ import time
 import numpy as np
 from scservo_sdk import *
 
-ADDR_TORQUE_ENABLE    = 40
-ADDR_GOAL_POSITION    = 42
+ADDR_TORQUE_ENABLE = 40
+ADDR_GOAL_POSITION = 42
 ADDR_PRESENT_POSITION = 56
-ADDR_PRESENT_LOAD     = 60
-ADDR_PRESENT_CURRENT  = 69
+ADDR_PRESENT_LOAD = 60
+ADDR_PRESENT_CURRENT = 69
 
 LIFT_ID = 2
 
 # the horizontal pose, as set by hand this session
 POSE = {2: 2000, 3: 1875, 4: 2020, 5: 2074}
 
-MASS_KG = 0.209          # Galaxy S23 FE, Samsung spec
-G       = 9.81
-LEVER_M = 0.35            # <-- MEASURE THIS. metres. pivot to grip point.
+MASS_KG = 0.209  # Galaxy S23 FE, Samsung spec
+G = 9.81
+LEVER_M = 0.35  # <-- MEASURE THIS. metres. pivot to grip point.
 
-N_READS  = 40            # per trial
-N_TRIALS = 3             # repeat the whole pair this many times
+N_READS = 40  # per trial
+N_TRIALS = 3  # repeat the whole pair this many times
 SETTLE_S = 2.0
 
 if LEVER_M <= 0:
     raise SystemExit("set LEVER_M to the measured distance in metres")
 
-p = PortHandler('/dev/ttyACM0')
-if not p.openPort():        raise SystemExit("failed to open port")
-if not p.setBaudRate(1000000): raise SystemExit("failed baud")
+p = PortHandler("/dev/ttyACM0")
+if not p.openPort():
+    raise SystemExit("failed to open port")
+if not p.setBaudRate(1000000):
+    raise SystemExit("failed baud")
 h = PacketHandler(0)
+
 
 def safe2(sid, addr):
     try:
@@ -55,10 +58,13 @@ def safe2(sid, addr):
     except (IndexError, TypeError):
         return None
 
+
 def signed_load(sid):
     v = safe2(sid, ADDR_PRESENT_LOAD)
-    if v is None: return None
+    if v is None:
+        return None
     return -(v & 0x3FF) if (v & 0x400) else (v & 0x3FF)
+
 
 def set_pose():
     for i, t in POSE.items():
@@ -66,19 +72,24 @@ def set_pose():
         h.write2ByteTxRx(p, i, ADDR_GOAL_POSITION, t)
     time.sleep(SETTLE_S)
 
+
 def sample(tag):
     set_pose()
     loads, currs = [], []
     for _ in range(N_READS):
         l, c = signed_load(LIFT_ID), safe2(LIFT_ID, ADDR_PRESENT_CURRENT)
         if l is not None and c is not None:
-            loads.append(abs(l)); currs.append(c)
+            loads.append(abs(l))
+            currs.append(c)
         time.sleep(0.02)
     pos = safe2(LIFT_ID, ADDR_PRESENT_POSITION)
     ml, sd = np.median(loads), np.std(loads)
-    print(f"  {tag:<12} load {ml:7.1f} +/- {sd:5.2f}   "
-          f"current {np.median(currs):5.1f}   pos {pos}   n={len(loads)}")
+    print(
+        f"  {tag:<12} load {ml:7.1f} +/- {sd:5.2f}   "
+        f"current {np.median(currs):5.1f}   pos {pos}   n={len(loads)}"
+    )
     return ml
+
 
 print(f"\nmass {MASS_KG*1000:.0f} g, lever {LEVER_M*100:.1f} cm")
 known_torque = MASS_KG * G * LEVER_M
@@ -107,6 +118,6 @@ print(f"       1 load unit = {1/scale:.5f} N*m")
 print("\nconverting the velocity-sweep fit:")
 print(f"  Coulomb friction  22.9 units  -> {22.9/scale:.4f} N*m")
 print(f"  viscous damping  0.289 units per tick/s")
-tick_per_rad = 4096 / (2*np.pi)
+tick_per_rad = 4096 / (2 * np.pi)
 print(f"       -> {0.289 * tick_per_rad / scale:.5f} N*m*s/rad")
 print("\n(frictionloss and damping for the MJCF)")

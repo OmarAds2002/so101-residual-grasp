@@ -10,35 +10,38 @@ import time
 from scservo_sdk import *
 
 ADDR_TORQUE_ENABLE = 40
-ADDR_GOAL_ACC      = 41
+ADDR_GOAL_ACC = 41
 ADDR_GOAL_POSITION = 42
-ADDR_GOAL_SPEED    = 46
-ADDR_PRESENT_POS   = 56
+ADDR_GOAL_SPEED = 46
+ADDR_PRESENT_POS = 56
 
-BAUDRATE     = 1000000
-DEVICENAME   = '/dev/ttyACM0'
+BAUDRATE = 1000000
+DEVICENAME = "/dev/ttyACM0"
 PROTOCOL_END = 0
 
 SLOW_SPEED = 300
-SLOW_ACC   = 10
+SLOW_ACC = 10
 
 TICKS_PER_REV = 4096
+
+
 def rad_to_ticks(r):
     return r * TICKS_PER_REV / (2 * math.pi)
 
+
 # name, id, offset, sign
 CAL = [
-    ("shoulder_pan",  1, 2096, -1),
-    ("shoulder_lift", 2, 2154,  1),
-    ("elbow_flex",    3, 1875, -1),
-    ("wrist_flex",    4, 2020,  1),
-    ("wrist_roll",    5, 2074, -1),
-    ("gripper",       6, 2266,  1),
+    ("shoulder_pan", 1, 2096, -1),
+    ("shoulder_lift", 2, 2154, 1),
+    ("elbow_flex", 3, 1875, -1),
+    ("wrist_flex", 4, 2020, 1),
+    ("wrist_roll", 5, 2074, -1),
+    ("gripper", 6, 2266, 1),
 ]
 
-TARGET_RAD = 0.0          # change to 0.5 for the second pass
+TARGET_RAD = 0.0  # change to 0.5 for the second pass
 
-portHandler   = PortHandler(DEVICENAME)
+portHandler = PortHandler(DEVICENAME)
 packetHandler = PacketHandler(PROTOCOL_END)
 portHandler.openPort()
 portHandler.setBaudRate(BAUDRATE)

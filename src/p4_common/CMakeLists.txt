@@ -46,10 +46,10 @@ if(BUILD_TESTING)
   target_link_libraries(test_joint_order tinyxml2::tinyxml2)
   target_link_libraries(test_calibration p4_common tinyxml2)
   target_compile_definitions(test_joint_order PRIVATE
-  URDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/urdf/so101_new_calib.urdf")
+    URDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/urdf/so101_new_calib.urdf")
   target_compile_definitions(test_calibration PRIVATE
-  CALIBRATION_PATH="${CMAKE_CURRENT_SOURCE_DIR}/config/calibration.yaml"
-  URDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/urdf/so101_new_calib.urdf")
+    CALIBRATION_PATH="${CMAKE_CURRENT_SOURCE_DIR}/config/calibration.yaml"
+    URDF_PATH="${CMAKE_CURRENT_SOURCE_DIR}/urdf/so101_new_calib.urdf")
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()

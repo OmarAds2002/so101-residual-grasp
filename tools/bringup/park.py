@@ -17,7 +17,7 @@ ADDR_TORQUE_ENABLE = 40
 ADDR_GOAL_POSITION = 42
 ADDR_PRESENT_POSITION = 56
 
-DEVICENAME, BAUDRATE, PROTOCOL_END = '/dev/ttyACM0', 1000000, 0
+DEVICENAME, BAUDRATE, PROTOCOL_END = "/dev/ttyACM0", 1000000, 0
 
 # offsets from calibration.yaml = 0 rad for each joint
 OFFSETS = {1: 2096, 2: 2154, 3: 1875, 4: 2020, 5: 2074, 6: 2266}
@@ -25,20 +25,22 @@ OFFSETS = {1: 2096, 2: 2154, 3: 1875, 4: 2020, 5: 2074, 6: 2266}
 # sysid pose, as ticks away from each joint's zero.
 # tune SHOULDER_LIFT / ELBOW until the wrist hangs in free air.
 POSE = {
-    1: 0,      # shoulder_pan  — stays at zero, this is the joint under test
-    2: -400,   # shoulder_lift — raises the arm
-    3: +500,   # elbow_flex    — folds the forearm up
+    1: 0,  # shoulder_pan  — stays at zero, this is the joint under test
+    2: -400,  # shoulder_lift — raises the arm
+    3: +500,  # elbow_flex    — folds the forearm up
     4: 0,
     5: 0,
     6: 0,
 }
 
-APPROACH = 60      # always arrive from this side
+APPROACH = 60  # always arrive from this side
 SETTLE_S = 1.5
 
 p = PortHandler(DEVICENAME)
-if not p.openPort():            raise SystemExit("failed to open port")
-if not p.setBaudRate(BAUDRATE): raise SystemExit("failed baud")
+if not p.openPort():
+    raise SystemExit("failed to open port")
+if not p.setBaudRate(BAUDRATE):
+    raise SystemExit("failed baud")
 h = PacketHandler(PROTOCOL_END)
 
 input("Arm supported, hands clear, space clear? [enter] ")

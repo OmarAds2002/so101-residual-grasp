@@ -21,8 +21,7 @@ constexpr int kMaxServoId = 253;
 int RequireInt(const YAML::Node & node, const char * field, const std::string & joint)
 {
   if (!node[field]) {
-    throw std::runtime_error(
-      "calibration for joint '" + joint + "' is missing field: " + field);
+    throw std::runtime_error("calibration for joint '" + joint + "' is missing field: " + field);
   }
   try {
     return node[field].as<int>();
@@ -44,12 +43,12 @@ std::array<JointCalibration, kNumJoints> LoadCalibration(const std::string & pat
 
   if (!root["servos"] || !root["servos"].IsMap()) {
     throw std::runtime_error(
-            "calibration file '" + path + "' has no 'servos' map at the top level");
+      "calibration file '" + path + "' has no 'servos' map at the top level");
   }
   const YAML::Node servos = root["servos"];
 
   std::array<JointCalibration, kNumJoints> result{};
-  std::unordered_map<int, std::size_t> seen_ids;   // servo_id -> joint index
+  std::unordered_map<int, std::size_t> seen_ids;  // servo_id -> joint index
 
   for (std::size_t i = 0; i < kNumJoints; ++i) {
     const std::string joint(joint_order[i]);
@@ -69,17 +68,17 @@ std::array<JointCalibration, kNumJoints> LoadCalibration(const std::string & pat
 
     if (cal.offset < kMinTick || cal.offset > kMaxTick) {
       throw std::runtime_error(
-              "joint '" + joint + "' has offset " + std::to_string(cal.offset) +
-              ", outside the tick range 0-4095");
+        "joint '" + joint + "' has offset " + std::to_string(cal.offset) +
+        ", outside the tick range 0-4095");
     }
     if (cal.servo_id < kMinServoId || cal.servo_id > kMaxServoId) {
       throw std::runtime_error(
-              "joint '" + joint + "' has servo_id " + std::to_string(cal.servo_id) +
-              ", outside the legal range 1-253");
+        "joint '" + joint + "' has servo_id " + std::to_string(cal.servo_id) +
+        ", outside the legal range 1-253");
     }
     if (cal.sign != 1 && cal.sign != -1) {
       throw std::runtime_error(
-              "joint '" + joint + "' has sign " + std::to_string(cal.sign) + ", must be 1 or -1");
+        "joint '" + joint + "' has sign " + std::to_string(cal.sign) + ", must be 1 or -1");
     }
 
     // emplace reports whether the id was new. If not, it->second is the
@@ -87,9 +86,8 @@ std::array<JointCalibration, kNumJoints> LoadCalibration(const std::string & pat
     const auto [it, inserted] = seen_ids.emplace(cal.servo_id, i);
     if (!inserted) {
       throw std::runtime_error(
-              "calibration file has duplicate servo_id " + std::to_string(cal.servo_id) +
-              " for joints '" + std::string(joint_order[it->second]) +
-              "' and '" + joint + "'");
+        "calibration file has duplicate servo_id " + std::to_string(cal.servo_id) +
+        " for joints '" + std::string(joint_order[it->second]) + "' and '" + joint + "'");
     }
 
     result[i] = cal;
@@ -97,9 +95,9 @@ std::array<JointCalibration, kNumJoints> LoadCalibration(const std::string & pat
 
   if (servos.size() != kNumJoints) {
     throw std::runtime_error(
-            "calibration file '" + path + "' has " + std::to_string(servos.size()) +
-            " entries, expected " + std::to_string(kNumJoints) +
-            " - check for a misspelled or extra joint name");
+      "calibration file '" + path + "' has " + std::to_string(servos.size()) +
+      " entries, expected " + std::to_string(kNumJoints) +
+      " - check for a misspelled or extra joint name");
   }
 
   return result;

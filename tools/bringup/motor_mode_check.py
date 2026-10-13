@@ -9,9 +9,11 @@ import time
 from scservo_sdk import *
 
 SCS_ID = 1
-p = PortHandler('/dev/ttyACM0')
-p.openPort(); p.setBaudRate(1000000)
+p = PortHandler("/dev/ttyACM0")
+p.openPort()
+p.setBaudRate(1000000)
 h = PacketHandler(0)
+
 
 def raw_read(addr, size, name):
     try:
@@ -24,10 +26,16 @@ def raw_read(addr, size, name):
         print(f"  {name:<20} {'--':>6}   EXCEPTION {type(e).__name__}")
         return None
 
+
 print("\n--- before any change ---")
-for a, s, n in [(33, 1, "mode"), (9, 2, "min_angle"),
-                (11, 2, "max_angle"), (56, 2, "position"),
-                (60, 2, "load"), (40, 1, "torque_enable")]:
+for a, s, n in [
+    (33, 1, "mode"),
+    (9, 2, "min_angle"),
+    (11, 2, "max_angle"),
+    (56, 2, "position"),
+    (60, 2, "load"),
+    (40, 1, "torque_enable"),
+]:
     raw_read(a, s, n)
 
 print("\n--- switching to motor mode ---")
@@ -47,9 +55,14 @@ h.write1ByteTxRx(p, SCS_ID, 40, 1)
 time.sleep(0.5)
 
 print("\n--- after the change, did it take? ---")
-for a, s, n in [(33, 1, "mode"), (9, 2, "min_angle"),
-                (11, 2, "max_angle"), (56, 2, "position"),
-                (60, 2, "load"), (40, 1, "torque_enable")]:
+for a, s, n in [
+    (33, 1, "mode"),
+    (9, 2, "min_angle"),
+    (11, 2, "max_angle"),
+    (56, 2, "position"),
+    (60, 2, "load"),
+    (40, 1, "torque_enable"),
+]:
     raw_read(a, s, n)
 
 print("\n--- spin at 300 for 1.5 s ---")
@@ -62,12 +75,18 @@ while time.perf_counter() - t0 < 1.5:
 h.write2ByteTxRx(p, SCS_ID, 42, 0)
 
 print("\n--- restoring position mode ---")
-h.write1ByteTxRx(p, SCS_ID, 40, 0); time.sleep(0.1)
-h.write1ByteTxRx(p, SCS_ID, 55, 0); time.sleep(0.1)
-h.write2ByteTxRx(p, SCS_ID, 9, 0);  time.sleep(0.1)
-h.write2ByteTxRx(p, SCS_ID, 11, 4095); time.sleep(0.1)
-h.write1ByteTxRx(p, SCS_ID, 33, 0); time.sleep(0.1)
-h.write1ByteTxRx(p, SCS_ID, 55, 1); time.sleep(0.3)
+h.write1ByteTxRx(p, SCS_ID, 40, 0)
+time.sleep(0.1)
+h.write1ByteTxRx(p, SCS_ID, 55, 0)
+time.sleep(0.1)
+h.write2ByteTxRx(p, SCS_ID, 9, 0)
+time.sleep(0.1)
+h.write2ByteTxRx(p, SCS_ID, 11, 4095)
+time.sleep(0.1)
+h.write1ByteTxRx(p, SCS_ID, 33, 0)
+time.sleep(0.1)
+h.write1ByteTxRx(p, SCS_ID, 55, 1)
+time.sleep(0.3)
 for a, s, n in [(33, 1, "mode"), (9, 2, "min_angle"), (11, 2, "max_angle")]:
     raw_read(a, s, n)
 

@@ -1,0 +1,25 @@
+---
+BasedOnStyle: Google
+AccessModifierOffset: -2
+AlignAfterOpenBracket: AlwaysBreak
+BraceWrapping:
+  AfterClass: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterUnion: true
+  AfterControlStatement: Never
+  BeforeCatch: false
+  BeforeElse: false
+BreakBeforeBraces: Custom
+ColumnLimit: 100
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 2
+DerivePointerAlignment: false
+IndentWidth: 2
+PointerAlignment: Middle
+ReflowComments: false
+SortIncludes: Never
+TabWidth: 2
+UseTab: Never

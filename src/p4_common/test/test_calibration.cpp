@@ -11,9 +11,7 @@
 
 namespace fs = std::filesystem;
 
-
-void ExpectThrowNaming(const std::string & path,
-                       const std::vector<std::string> & must_contain)
+void ExpectThrowNaming(const std::string & path, const std::vector<std::string> & must_contain)
 {
   try {
     p4_common::LoadCalibration(path);
@@ -34,14 +32,11 @@ protected:
   void SetUp() override
   {
     dir_ = fs::temp_directory_path() / "p4_common_calibration_test";
-    fs::remove_all(dir_);      // wipe leftovers from a crashed run
+    fs::remove_all(dir_);  // wipe leftovers from a crashed run
     fs::create_directories(dir_);
   }
 
-  void TearDown() override
-  {
-    fs::remove_all(dir_);
-  }
+  void TearDown() override { fs::remove_all(dir_); }
 
   // Write text to <temp dir>/name and hand back the full path.
   std::string WriteFile(const std::string & name, const std::string & text)
@@ -134,10 +129,8 @@ std::array<JointLimits, p4_common::kNumJoints> LoadUrdfLimits(const std::string 
   std::array<JointLimits, p4_common::kNumJoints> limits{};
   std::array<bool, p4_common::kNumJoints> seen{};
 
-  for (const tinyxml2::XMLElement * j = robot->FirstChildElement("joint");
-       j != nullptr;
-       j = j->NextSiblingElement("joint"))
-  {
+  for (const tinyxml2::XMLElement * j = robot->FirstChildElement("joint"); j != nullptr;
+       j = j->NextSiblingElement("joint")) {
     // gripper_frame_joint is type="fixed" -- seven tags, six actuated.
     const char * type = j->Attribute("type");
     if (type == nullptr || std::string(type) != "revolute") {
@@ -151,8 +144,7 @@ std::array<JointLimits, p4_common::kNumJoints> LoadUrdfLimits(const std::string 
 
     const std::optional<std::size_t> index = JointNameToIndex(name);
     if (!index.has_value()) {
-      throw std::runtime_error(
-              "URDF revolute joint not in joint_order: " + std::string(name));
+      throw std::runtime_error("URDF revolute joint not in joint_order: " + std::string(name));
     }
 
     const tinyxml2::XMLElement * limit = j->FirstChildElement("limit");
@@ -164,11 +156,10 @@ std::array<JointLimits, p4_common::kNumJoints> LoadUrdfLimits(const std::string 
     // would quietly hand back 0.0.
     double lower = 0.0;
     double upper = 0.0;
-    if (limit->QueryDoubleAttribute("lower", &lower) != tinyxml2::XML_SUCCESS ||
-      limit->QueryDoubleAttribute("upper", &upper) != tinyxml2::XML_SUCCESS)
-    {
-      throw std::runtime_error(
-              "joint <limit> missing lower or upper: " + std::string(name));
+    if (
+      limit->QueryDoubleAttribute("lower", &lower) != tinyxml2::XML_SUCCESS ||
+      limit->QueryDoubleAttribute("upper", &upper) != tinyxml2::XML_SUCCESS) {
+      throw std::runtime_error("joint <limit> missing lower or upper: " + std::string(name));
     }
 
     limits[*index] = {lower, upper};
@@ -178,8 +169,7 @@ std::array<JointLimits, p4_common::kNumJoints> LoadUrdfLimits(const std::string 
   for (std::size_t i = 0; i < p4_common::kNumJoints; ++i) {
     if (!seen[i]) {
       throw std::runtime_error(
-              "URDF had no revolute joint named " +
-              std::string(p4_common::joint_order[i]));
+        "URDF had no revolute joint named " + std::string(p4_common::joint_order[i]));
     }
   }
 
@@ -203,13 +193,9 @@ TEST(RealCalibration, UrdfLimitsMapInsideTickRange)
     const double lo_ticks = p4_common::RadToTicks(limits[i].lower, cal[i]);
     const double hi_ticks = p4_common::RadToTicks(limits[i].upper, cal[i]);
 
-    EXPECT_GE(lo_ticks, 0.0) << name << " lower limit maps to "
-                             << lo_ticks << " ticks";
-    EXPECT_LE(lo_ticks, 4095.0) << name << " lower limit maps to "
-                                << lo_ticks << " ticks";
-    EXPECT_GE(hi_ticks, 0.0) << name << " upper limit maps to "
-                             << hi_ticks << " ticks";
-    EXPECT_LE(hi_ticks, 4095.0) << name << " upper limit maps to "
-                                << hi_ticks << " ticks";
+    EXPECT_GE(lo_ticks, 0.0) << name << " lower limit maps to " << lo_ticks << " ticks";
+    EXPECT_LE(lo_ticks, 4095.0) << name << " lower limit maps to " << lo_ticks << " ticks";
+    EXPECT_GE(hi_ticks, 0.0) << name << " upper limit maps to " << hi_ticks << " ticks";
+    EXPECT_LE(hi_ticks, 4095.0) << name << " upper limit maps to " << hi_ticks << " ticks";
   }
 }

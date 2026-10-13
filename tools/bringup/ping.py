@@ -1,14 +1,17 @@
-
 import os
 
-if os.name == 'nt':
+if os.name == "nt":
     import msvcrt
+
     def getch():
         return msvcrt.getch().decode()
+
 else:
     import sys, tty, termios
+
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
+
     def getch():
         try:
             tty.setraw(sys.stdin.fileno())
@@ -17,15 +20,16 @@ else:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return ch
 
-from scservo_sdk import *                 # Uses SCServo SDK library
+
+from scservo_sdk import *  # Uses SCServo SDK library
 
 # Default setting
-SCS_IDS                 = [1,2,3,4,5,6]               # SCServo IDs : 1
-BAUDRATE                = 1000000           # SCServo default baudrate : 1000000
-DEVICENAME              = '/dev/ttyACM0'    # Check which port is being used on your controller
-                                            # ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
+SCS_IDS = [1, 2, 3, 4, 5, 6]  # SCServo IDs : 1
+BAUDRATE = 1000000  # SCServo default baudrate : 1000000
+DEVICENAME = "/dev/ttyACM0"  # Check which port is being used on your controller
+# ex) Windows: "COM1"   Linux: "/dev/ttyUSB0" Mac: "/dev/tty.usbserial-*"
 
-protocol_end            = 0                 # SCServo bit end(STS/SMS=0, SCS=1)
+protocol_end = 0  # SCServo bit end(STS/SMS=0, SCS=1)
 
 # Initialize PortHandler instance
 # Set the port path
@@ -58,13 +62,18 @@ else:
 # Try to ping the SCServo
 # Get SCServo model number
 for SCS_ID in SCS_IDS:
-    scs_model_number, scs_comm_result, scs_error = packetHandler.ping(portHandler, SCS_ID)
+    scs_model_number, scs_comm_result, scs_error = packetHandler.ping(
+        portHandler, SCS_ID
+    )
     if scs_comm_result != COMM_SUCCESS:
         print("%s" % packetHandler.getTxRxResult(scs_comm_result))
     elif scs_error != 0:
         print("%s" % packetHandler.getRxPacketError(scs_error))
     else:
-        print("[ID:%03d] ping Succeeded. SCServo model number : %d" % (SCS_ID, scs_model_number))
+        print(
+            "[ID:%03d] ping Succeeded. SCServo model number : %d"
+            % (SCS_ID, scs_model_number)
+        )
 
 # Close port
 portHandler.closePort()

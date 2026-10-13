@@ -12,7 +12,7 @@ find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 
-add_library(p4_hardware SHARED src/stub_system.cpp)
+add_library(p4_hardware SHARED src/stub_system.cpp src/serial_port.cpp src/feetech_bus.cpp)
 
 
 target_include_directories(p4_hardware PUBLIC
@@ -51,6 +51,8 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_feetech_protocol test/test_feetech_protocol.cpp)
+  ament_add_gtest(test_serial_port test/test_serial_port.cpp)
+  target_link_libraries(test_serial_port p4_hardware)
   target_include_directories(test_feetech_protocol PRIVATE include)
 endif()
 

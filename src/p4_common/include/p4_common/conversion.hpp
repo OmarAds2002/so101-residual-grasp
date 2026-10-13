@@ -12,8 +12,7 @@ namespace p4_common
 {
 
 inline constexpr int kTicksPerRevolution = 4096;
-inline constexpr double kRadPerTick =
-  2.0 * std::numbers::pi / kTicksPerRevolution;
+inline constexpr double kRadPerTick = 2.0 * std::numbers::pi / kTicksPerRevolution;
 
 // One joint. Returns fractional ticks on purpose — rounding happens
 // where bytes are packed, not here.
